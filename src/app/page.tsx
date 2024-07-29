@@ -7,28 +7,37 @@ import {
   Marker,
   InfoWindow,
 } from "@react-google-maps/api";
-import markerIstia from "@/assets/images/WhatsApp Image 2024-07-25 at 10.17.55.jpeg";
+
+// Define TypeScript types for the location objects
+interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+interface MapComponentProps {
+  onDistanceChange: (distance: number) => void;
+}
 
 const containerStyle = {
   width: "100%",
   height: "400px",
 };
 
-const rafli = {
+const rafli: LatLng = {
   lng: 106.69634326150316,
   lat: -6.202816524618473,
 };
 
-const istia = {
+const istia: LatLng = {
   lat: -6.4284559362011615,
   lng: 108.28326103466544,
 };
 
-function MapComponent({ onDistanceChange }) {
-  const mapRef = useRef(null);
-  const [selected, setSelected] = useState(null);
+function MapComponent({ onDistanceChange }: MapComponentProps) {
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const [selected, setSelected] = useState<LatLng | null>(null);
 
-  const onLoad = (map) => {
+  const onLoad = (map: google.maps.Map) => {
     mapRef.current = map;
     const bounds = new window.google.maps.LatLngBounds();
     bounds.extend(rafli);
@@ -41,9 +50,9 @@ function MapComponent({ onDistanceChange }) {
       const distance = computeDistance(rafli, istia);
       onDistanceChange(distance);
     }
-  }, []);
+  }, [onDistanceChange]);
 
-  const computeDistance = (loc1, loc2) => {
+  const computeDistance = (loc1: LatLng, loc2: LatLng) => {
     const latLng1 = new window.google.maps.LatLng(loc1.lat, loc1.lng);
     const latLng2 = new window.google.maps.LatLng(loc2.lat, loc2.lng);
     return window.google.maps.geometry.spherical.computeDistanceBetween(latLng1, latLng2);
@@ -58,7 +67,6 @@ function MapComponent({ onDistanceChange }) {
     >
       <Marker
         position={rafli}
-        icon={markerIstia}
         onClick={() => setSelected(rafli)}
       />
       <Marker position={istia} onClick={() => setSelected(istia)} />
@@ -75,7 +83,7 @@ function MapComponent({ onDistanceChange }) {
 }
 
 export default function Home() {
-  const [distance, setDistance] = useState(null);
+  const [distance, setDistance] = useState<number | null>(null);
 
   return (
     <div>
